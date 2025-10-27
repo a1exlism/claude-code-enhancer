@@ -10,23 +10,54 @@
 
 ## 快速开始
 
-### 消息通知配置
+### 一键配置
 
-1. 设置环境变量：
 ```bash
-export TELEGRAM_BOT_TOKEN_AIAGENTNOTIFY="your_bot_token"
-export TELEGRAM_CHAT_ID_AIAGENTNOTIFY="your_chat_id"
+# 1. 配置环境变量
+cp .env.template .env
+# 编辑 .env 填入你的 Telegram Bot Token 和 Chat ID
+
+# 2. 自动配置 Claude Code hooks
+python3 setup_claude.py
 ```
 
-2. 配置 Claude Code hooks：
+### 手动配置（可选）
+
+如果不使用一键配置脚本，可以手动编辑 `~/.claude/settings.json`：
+
 ```json
 {
   "hooks": {
-    "SessionStart": "~/scripts/aiagent_notify.sh",
-    "SessionEnd": "~/scripts/aiagent_notify.sh",
-    "PostToolUse": "~/scripts/aiagent_notify.sh"
+    "SessionEnd": [{
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "python3 ~/scripts/aiagent_notify.py",
+        "timeout": 5
+      }]
+    }],
+    "Stop": [{
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "python3 ~/scripts/aiagent_notify.py",
+        "timeout": 5
+      }]
+    }]
   }
 }
+```
+
+### 环境变量说明
+
+- `TELEGRAM_BOT_TOKEN_AIAGENTNOTIFY`: Telegram Bot Token
+- `TELEGRAM_CHAT_ID_AIAGENTNOTIFY`: Telegram Chat ID
+- `AIAGENT_ENV_FILE`: 自定义 .env 文件路径（可选，默认为当前目录 `.env`）
+
+### 测试
+
+```bash
+./test/test_aiagent_notify.sh
 ```
 
 ## 许可证
