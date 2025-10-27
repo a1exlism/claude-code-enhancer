@@ -5,6 +5,10 @@
 ## 功能特性
 
 - **消息通知**：实时推送 Claude Code 会话事件到 Telegram
+  - 会话结束通知（SessionEnd）
+  - 会话中断通知（Stop）
+  - 错误/警告通知（Notification）
+  - 上下文不足警告（PreCompact）
 - **项目配置**：一键配置 CLAUDE.md 等基础文件
 - **项目索引**：引导式提供项目结构索引
 
@@ -21,45 +25,22 @@ cp .env.template .env
 python3 setup_claude.py
 ```
 
-### 手动配置（可选）
+### 配置说明
 
-如果不使用一键配置脚本，可以手动编辑 `~/.claude/settings.json`：
+- **全局配置**：`~/.claude/settings.json` - 对所有项目生效
+- **项目配置**：`.claude/settings.json` - 仅对当前项目生效
 
-```json
-{
-  "hooks": {
-    "SessionEnd": [{
-      "matcher": "",
-      "hooks": [{
-        "type": "command",
-        "command": "python3 ~/scripts/aiagent_notify.py",
-        "timeout": 5
-      }]
-    }],
-    "Stop": [{
-      "matcher": "",
-      "hooks": [{
-        "type": "command",
-        "command": "python3 ~/scripts/aiagent_notify.py",
-        "timeout": 5
-      }]
-    }]
-  }
-}
-```
+### 环境变量
 
-### 环境变量说明
+在 `.env` 文件中配置：
 
 - `TELEGRAM_BOT_TOKEN_AIAGENTNOTIFY`: Telegram Bot Token
 - `TELEGRAM_CHAT_ID_AIAGENTNOTIFY`: Telegram Chat ID
-- `AIAGENT_ENV_FILE`: 自定义 .env 文件路径（可选，默认为当前目录 `.env`）
+
+环境变量加载优先级：当前项目 `.env` > 用户主目录 `~/.env`
 
 ### 测试
 
 ```bash
 ./test/test_aiagent_notify.sh
 ```
-
-## 许可证
-
-MIT
