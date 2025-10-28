@@ -1,5 +1,14 @@
 # Changelog
 
+## 2025-10-28
+
+### Added
+
+- 新增 skill_install.py 一键安装脚本
+- 新增 CLAUDE_SKILLS_SETUP.md 安装指南文档
+- 支持自动安装 Claude Skills (document-skills + example-skills)
+- 支持自动配置插件市场
+
 ## 2025-10-27
 
 ### Added
