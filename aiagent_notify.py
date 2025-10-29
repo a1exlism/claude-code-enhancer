@@ -52,6 +52,22 @@ if hook_event not in ["SessionEnd", "Stop", "Notification", "PreCompact"]:
 if hook_event == "SessionEnd" and data.get("reason") == "clear":
     sys.exit(0)
 
+# 使用临时文件标记 PreCompact 事件，避免重复通知
+precompact_marker = Path("/tmp/claude_precompact_marker")
+if hook_event == "PreCompact":
+    # 标记 PreCompact 事件已触发
+    precompact_marker.touch()
+elif hook_event == "Notification":
+    # 检查是否在 PreCompact 后的 5 秒内
+    if precompact_marker.exists():
+        marker_time = precompact_marker.stat().st_mtime
+        if datetime.now().timestamp() - marker_time < 5:
+            # 忽略 PreCompact 后的 Notification
+            sys.exit(0)
+        else:
+            # 清理过期标记
+            precompact_marker.unlink(missing_ok=True)
+
 # 提取最后一条 assistant 消息
 last_response = ""
 transcript_path = data.get("transcript_path", "")

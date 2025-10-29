@@ -1,5 +1,11 @@
 # Changelog
 
+## 2025-10-30
+
+### Fixed
+
+- 修复 PreCompact 事件重复发送通知问题
+
 ## 2025-10-29
 
 ### Changed
