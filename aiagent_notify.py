@@ -48,6 +48,10 @@ hook_event = data.get("hook_event_name", "Unknown")
 if hook_event not in ["SessionEnd", "Stop", "Notification", "PreCompact"]:
     sys.exit(0)
 
+# 忽略 /clear 命令触发的 SessionEnd
+if hook_event == "SessionEnd" and data.get("reason") == "clear":
+    sys.exit(0)
+
 # 提取最后一条 assistant 消息
 last_response = ""
 transcript_path = data.get("transcript_path", "")

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-10-29
+
+### Changed
+
+- 更新 .gitignore 为标准 Python 项目模板
+- 忽略 /clear 命令触发的 SessionEnd 通知
+
 ## 2025-10-28
 
 ### Added
