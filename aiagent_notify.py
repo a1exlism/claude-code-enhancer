@@ -11,43 +11,28 @@ def summarize_with_llm(text, api_type, api_key, api_base, model):
     if not text or not api_key:
         return text
 
-    # 读取总结模板
     prompt_file = Path(__file__).parent / "summary_prompt.txt"
     if not prompt_file.exists():
         return text
 
     try:
         with prompt_file.open() as f:
-            prompt_template = f.read()
+            prompt = f.read().format(response=text[:2000])
 
-        prompt = prompt_template.format(response=text[:2000])
-
-        # 构建请求
         headers = {"Content-Type": "application/json"}
 
         if api_type == "anthropic":
             headers["x-api-key"] = api_key
             headers["anthropic-version"] = "2023-06-01"
-            payload = {
-                "model": model,
-                "max_tokens": 200,
-                "messages": [{"role": "user", "content": prompt}]
-            }
+            payload = {"model": model, "max_tokens": 200, "messages": [{"role": "user", "content": prompt}]}
             url = f"{api_base}/v1/messages"
         elif api_type == "azure":
             headers["api-key"] = api_key
-            payload = {
-                "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": 200
-            }
+            payload = {"messages": [{"role": "user", "content": prompt}], "max_tokens": 200}
             url = f"{api_base}/openai/deployments/{model}/chat/completions?api-version=2024-02-15-preview"
         else:  # openai
             headers["Authorization"] = f"Bearer {api_key}"
-            payload = {
-                "model": model,
-                "max_tokens": 200,
-                "messages": [{"role": "user", "content": prompt}]
-            }
+            payload = {"model": model, "max_tokens": 200, "messages": [{"role": "user", "content": prompt}]}
             url = f"{api_base}/v1/chat/completions"
 
         resp = requests.post(url, headers=headers, json=payload, timeout=10)
@@ -55,9 +40,9 @@ def summarize_with_llm(text, api_type, api_key, api_base, model):
         if resp.status_code == 200:
             data = resp.json()
             if api_type == "anthropic":
-                return data.get("content", [{}])[0].get("text", text)
+                return data["content"][0]["text"]
             else:
-                return data.get("choices", [{}])[0].get("message", {}).get("content", text)
+                return data["choices"][0]["message"]["content"]
     except Exception:
         pass
 

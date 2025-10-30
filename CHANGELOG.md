@@ -7,6 +7,10 @@
 - 新增 LLM 总结功能，支持 OpenAI/Azure/Anthropic API
 - 新增 summary_prompt.txt 总结模板文件
 
+### Changed
+
+- 优化 LLM API 调用，使用官方标准格式
+
 ### Fixed
 
 - 修复 PreCompact 事件重复发送通知问题
