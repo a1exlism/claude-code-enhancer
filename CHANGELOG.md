@@ -7,10 +7,13 @@
 - 新增 LLM 总结功能，支持 OpenAI/Azure/Anthropic API
 - 新增 summary_prompt.txt 总结模板文件
 - LLM 总结仅对超过 200 字的响应生效
+- TODO: 提示词风格、组装
 
 ### Changed
 
 - 优化 LLM API 调用，使用官方标准格式
+- 更新 .env.template 配置示例，明确支持的 API 类型和模型
+- 精简 CLAUDE.md 开发指南，移除冗余指令
 
 ### Fixed
 

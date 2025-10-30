@@ -153,4 +153,3 @@ When multiple valid approaches exist, choose based on:
 - Learn from existing implementations
 - 同步所有进度，所有修改同步至 @CHANGELOG.md 文件, 精简格式与字数(GNU Linux 风格)
 - git commit 来源于 @CHANGELOG.md，字数限定 50 字 内，忽略提交细节
-- 回答前应先分析输入 instruction 的合理性与指令的确定性，若不确定时应先提出问题然后再解决问题
