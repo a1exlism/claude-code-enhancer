@@ -8,6 +8,7 @@
 - 新增 summary_prompt.txt 总结模板文件
 - LLM 总结仅对超过 200 字的响应生效
 - TODO: 提示词风格、组装
+- 新增 CLAUDE_CODE_BEST_PRACTICES.md 最佳实践文档
 
 ### Changed
 
@@ -18,6 +19,10 @@
 ### Fixed
 
 - 修复 PreCompact 事件重复发送通知问题
+
+### Research
+
+- 完成 Claude Code 最佳实践调研（项目构建、上下文处理、MCP 集成）
 
 ## 2025-10-29
 
