@@ -2,6 +2,11 @@
 
 ## 2025-10-30
 
+### Added
+
+- 新增 LLM 总结功能，可选使用 OpenAI/Anthropic API 总结响应内容
+- 新增 summary_prompt.txt 总结模板文件
+
 ### Fixed
 
 - 修复 PreCompact 事件重复发送通知问题

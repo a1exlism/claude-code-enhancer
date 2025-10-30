@@ -6,6 +6,53 @@ from datetime import datetime
 import requests
 from pathlib import Path
 
+def summarize_with_llm(text, api_type, api_key, api_base, model):
+    """使用 LLM 总结文本"""
+    if not text or not api_key:
+        return text
+
+    # 读取总结模板
+    prompt_file = Path(__file__).parent / "summary_prompt.txt"
+    if not prompt_file.exists():
+        return text
+
+    try:
+        with prompt_file.open() as f:
+            prompt_template = f.read()
+
+        prompt = prompt_template.format(response=text[:2000])
+
+        # 构建请求
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+
+        if api_type == "anthropic":
+            payload = {
+                "model": model,
+                "max_tokens": 200,
+                "messages": [{"role": "user", "content": prompt}]
+            }
+            url = f"{api_base}/v1/messages"
+        else:  # openai
+            payload = {
+                "model": model,
+                "max_tokens": 200,
+                "messages": [{"role": "user", "content": prompt}]
+            }
+            url = f"{api_base}/v1/chat/completions"
+
+        resp = requests.post(url, headers=headers, json=payload, timeout=10)
+
+        if resp.status_code == 200:
+            data = resp.json()
+            if api_type == "anthropic":
+                return data.get("content", [{}])[0].get("text", text)
+            else:
+                return data.get("choices", [{}])[0].get("message", {}).get("content", text)
+    except Exception:
+        pass
+
+    return text
+
 # 读取 JSON 输入
 json_input = sys.stdin.read()
 
@@ -37,6 +84,11 @@ for env_path in [Path('.env'), Path.home() / '.env']:
 # 获取环境变量
 bot_token = os.environ.get("TELEGRAM_BOT_TOKEN_AIAGENTNOTIFY", "")
 chat_id = os.environ.get("TELEGRAM_CHAT_ID_AIAGENTNOTIFY", "")
+enable_summary = os.environ.get("AIAGENT_ENABLE_SUMMARY", "false").lower() == "true"
+llm_api_type = os.environ.get("AIAGENT_LLM_API_TYPE", "openai")
+llm_api_key = os.environ.get("AIAGENT_LLM_API_KEY", "")
+llm_api_base = os.environ.get("AIAGENT_LLM_API_BASE", "https://api.openai.com")
+llm_model = os.environ.get("AIAGENT_LLM_MODEL", "gpt-4o-mini")
 
 if not bot_token or not chat_id:
     sys.exit(0)
@@ -118,7 +170,12 @@ if hook_event in ["Notification", "PreCompact"]:
         message_text += f"\n*📋 Details:*\n`{escaped_msg}`\n"
 
 if last_response:
-    escaped_response = last_response[:500].replace("_", "\\_").replace("*", "\\*").replace("[", "\\[").replace("]", "\\]").replace("(", "\\(").replace(")", "\\)").replace("~", "\\~").replace("`", "\\`").replace(">", "\\>").replace("#", "\\#").replace("+", "\\+").replace("-", "\\-").replace("=", "\\=").replace("|", "\\|").replace("{", "\\{").replace("}", "\\}").replace(".", "\\.").replace("!", "\\!")
+    # 使用 LLM 总结（如果启用）
+    response_to_show = last_response
+    if enable_summary and llm_api_key:
+        response_to_show = summarize_with_llm(last_response, llm_api_type, llm_api_key, llm_api_base, llm_model)
+
+    escaped_response = response_to_show[:500].replace("_", "\\_").replace("*", "\\*").replace("[", "\\[").replace("]", "\\]").replace("(", "\\(").replace(")", "\\)").replace("~", "\\~").replace("`", "\\`").replace(">", "\\>").replace("#", "\\#").replace("+", "\\+").replace("-", "\\-").replace("=", "\\=").replace("|", "\\|").replace("{", "\\{").replace("}", "\\}").replace(".", "\\.").replace("!", "\\!")
     message_text += f"\n*💬 Last Response:*\n`{escaped_response}`"
 
 # 发送 Telegram 消息
