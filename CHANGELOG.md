@@ -4,7 +4,7 @@
 
 ### Added
 
-- 新增 LLM 总结功能，可选使用 OpenAI/Anthropic API 总结响应内容
+- 新增 LLM 总结功能，支持 OpenAI/Azure/Anthropic API
 - 新增 summary_prompt.txt 总结模板文件
 
 ### Fixed

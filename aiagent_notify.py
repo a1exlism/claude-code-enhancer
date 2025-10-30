@@ -23,16 +23,26 @@ def summarize_with_llm(text, api_type, api_key, api_base, model):
         prompt = prompt_template.format(response=text[:2000])
 
         # 构建请求
-        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json"}
 
         if api_type == "anthropic":
+            headers["x-api-key"] = api_key
+            headers["anthropic-version"] = "2023-06-01"
             payload = {
                 "model": model,
                 "max_tokens": 200,
                 "messages": [{"role": "user", "content": prompt}]
             }
             url = f"{api_base}/v1/messages"
+        elif api_type == "azure":
+            headers["api-key"] = api_key
+            payload = {
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 200
+            }
+            url = f"{api_base}/openai/deployments/{model}/chat/completions?api-version=2024-02-15-preview"
         else:  # openai
+            headers["Authorization"] = f"Bearer {api_key}"
             payload = {
                 "model": model,
                 "max_tokens": 200,
