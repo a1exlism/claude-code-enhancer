@@ -6,6 +6,7 @@
 
 - 新增 LLM 总结功能，支持 OpenAI/Azure/Anthropic API
 - 新增 summary_prompt.txt 总结模板文件
+- LLM 总结仅对超过 200 字的响应生效
 
 ### Changed
 

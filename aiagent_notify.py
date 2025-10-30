@@ -167,7 +167,7 @@ if hook_event in ["Notification", "PreCompact"]:
 if last_response:
     # 使用 LLM 总结（如果启用）
     response_to_show = last_response
-    if enable_summary and llm_api_key:
+    if enable_summary and llm_api_key and len(last_response) > 200:
         response_to_show = summarize_with_llm(last_response, llm_api_type, llm_api_key, llm_api_base, llm_model)
 
     escaped_response = response_to_show[:500].replace("_", "\\_").replace("*", "\\*").replace("[", "\\[").replace("]", "\\]").replace("(", "\\(").replace(")", "\\)").replace("~", "\\~").replace("`", "\\`").replace(">", "\\>").replace("#", "\\#").replace("+", "\\+").replace("-", "\\-").replace("=", "\\=").replace("|", "\\|").replace("{", "\\{").replace("}", "\\}").replace(".", "\\.").replace("!", "\\!")
