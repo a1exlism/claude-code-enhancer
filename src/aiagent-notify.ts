@@ -1,17 +1,15 @@
+#!/usr/bin/env node
 import fs from "node:fs";
 import os from "node:os";
-import path from "node:path";
 import readline from "node:readline";
-import { fileURLToPath } from "node:url";
-import axios from "axios";
-import { parse as parseEnv } from "dotenv";
+import { loadEnvFiles } from "./utils/env.js";
+import { escapeMarkdownV2, formatTimestamp } from "./utils/markdown.js";
+import { LlmClient, type LlmApiType } from "./utils/llm-client.js";
+import { createTelegramNotifier } from "./utils/notifier.js";
+import { sanitize, loadCustomPatterns } from "./utils/sanitizer.js";
+import * as logger from "./utils/logger.js";
 
-const LOG_FILE = "/tmp/claude_hook_debug.log";
 const PRECOMPACT_MARKER = "/tmp/claude_precompact_marker";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-type LlmApiType = "openai" | "azure" | "anthropic" | string;
 
 interface HookPayload {
   hook_event_name?: string;
@@ -20,16 +18,6 @@ interface HookPayload {
   notification_message?: unknown;
   cwd?: string;
   transcript_path?: string;
-}
-
-const ESCAPE_REGEX = /[\\_*\[\]()~`>#+\-=|{}.!]/g;
-
-function appendLog(content: string): void {
-  try {
-    fs.appendFileSync(LOG_FILE, content, { encoding: "utf-8" });
-  } catch {
-    // ignore logging failures
-  }
 }
 
 async function readStdin(): Promise<string> {
@@ -42,34 +30,6 @@ async function readStdin(): Promise<string> {
     process.stdin.on("end", () => resolve(data));
     process.stdin.resume();
   });
-}
-
-function loadEnvFiles(): void {
-  const candidates = [path.resolve(".env"), path.join(os.homedir(), ".env")];
-  for (const envPath of candidates) {
-    if (!fs.existsSync(envPath)) {
-      continue;
-    }
-    try {
-      const parsed = parseEnv(fs.readFileSync(envPath, "utf-8"));
-      for (const [key, value] of Object.entries(parsed)) {
-        if (process.env[key] === undefined && value !== undefined) {
-          process.env[key] = value;
-        }
-      }
-    } catch {
-      // ignore malformed env files
-    }
-  }
-}
-
-function escapeMarkdownV2(text: string): string {
-  return text.replace(ESCAPE_REGEX, (match) => `\\${match}`);
-}
-
-function formatTimestamp(date: Date): string {
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
 async function extractLastAssistantResponse(transcriptPath: string): Promise<string> {
@@ -103,7 +63,7 @@ async function extractLastAssistantResponse(transcriptPath: string): Promise<str
           }
         }
       } catch {
-        // ignore malformed lines
+        // 忽略格式错误的行
       }
     });
 
@@ -113,82 +73,11 @@ async function extractLastAssistantResponse(transcriptPath: string): Promise<str
   });
 }
 
-async function summarizeWithLLM(
-  text: string,
-  apiType: LlmApiType,
-  apiKey: string,
-  apiBase: string,
-  model: string,
-): Promise<string> {
-  if (!text || !apiKey) {
-    return text;
-  }
-
-  const promptPath = path.resolve(__dirname, "..", "summary_prompt.txt");
-  if (!fs.existsSync(promptPath)) {
-    return text;
-  }
-
-  try {
-    const template = fs.readFileSync(promptPath, "utf-8");
-    const prompt = template.replace(/\{response\}/g, text.slice(0, 2000));
-
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    let url: string;
-    let payload: Record<string, unknown>;
-
-    if (apiType === "anthropic") {
-      headers["x-api-key"] = apiKey;
-      headers["anthropic-version"] = "2023-06-01";
-      url = `${apiBase}/v1/messages`;
-      payload = {
-        model,
-        max_tokens: 200,
-        messages: [{ role: "user", content: prompt }],
-      };
-    } else if (apiType === "azure") {
-      headers["api-key"] = apiKey;
-      url = `${apiBase}/openai/deployments/${model}/chat/completions?api-version=2024-02-15-preview`;
-      payload = {
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 200,
-      };
-    } else {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-      url = `${apiBase}/v1/chat/completions`;
-      payload = {
-        model,
-        max_tokens: 200,
-        messages: [{ role: "user", content: prompt }],
-      };
-    }
-
-    const response = await axios.post(url, payload, { headers, timeout: 10_000 });
-    if (response.status === 200) {
-      if (apiType === "anthropic") {
-        const content = response.data?.content;
-        if (Array.isArray(content) && content[0]?.text) {
-          return content[0].text as string;
-        }
-      } else {
-        const choice = response.data?.choices?.[0]?.message?.content;
-        if (typeof choice === "string") {
-          return choice;
-        }
-      }
-    }
-  } catch {
-    // swallow LLM errors and fall back to original text
-  }
-
-  return text;
-}
-
 function touchMarker(filePath: string): void {
   try {
     fs.closeSync(fs.openSync(filePath, "a"));
   } catch {
-    // ignore touch failures
+    // 忽略 touch 失败
   }
 }
 
@@ -196,32 +85,20 @@ function removeMarker(filePath: string): void {
   try {
     fs.rmSync(filePath, { force: true });
   } catch {
-    // ignore removal failures
-  }
-}
-
-async function sendTelegramNotification(token: string, chatId: string, text: string): Promise<void> {
-  const payload = { chat_id: chatId, text, parse_mode: "MarkdownV2" };
-  const url = `https://api.telegram.org/bot${token}/sendMessage`;
-
-  try {
-    const resp = await axios.post(url, payload, { timeout: 5_000 });
-    const body = typeof resp.data === "string" ? resp.data : JSON.stringify(resp.data);
-    appendLog(`Response: ${resp.status} ${body}\n`);
-  } catch (error) {
-    appendLog(`Error: ${(error as Error).message}\n`);
+    // 忽略删除失败
   }
 }
 
 async function main(): Promise<void> {
   const jsonInput = await readStdin();
-  appendLog(`=== ${new Date().toISOString()} ===\n`);
-  appendLog(`Received JSON: ${jsonInput}\n`);
+  logger.info(`收到 Hook 事件`);
+  logger.debug(`JSON 输入: ${jsonInput}`);
 
   let payload: HookPayload;
   try {
     payload = JSON.parse(jsonInput);
   } catch {
+    logger.error("JSON 解析失败");
     return;
   }
 
@@ -236,6 +113,7 @@ async function main(): Promise<void> {
   const llmModel = process.env.AIAGENT_LLM_MODEL ?? "gpt-4o-mini";
 
   if (!botToken || !chatId) {
+    logger.error("Telegram 配置不完整，跳过通知");
     return;
   }
 
@@ -243,10 +121,12 @@ async function main(): Promise<void> {
   const allowedEvents = new Set(["SessionEnd", "Stop", "Notification", "PreCompact"]);
 
   if (!allowedEvents.has(hookEvent)) {
+    logger.debug(`忽略事件: ${hookEvent}`);
     return;
   }
 
   if (hookEvent === "SessionEnd" && payload.reason === "clear") {
+    logger.debug("忽略 /clear 命令触发的 SessionEnd");
     return;
   }
 
@@ -257,11 +137,12 @@ async function main(): Promise<void> {
       const stat = fs.statSync(PRECOMPACT_MARKER);
       const secondsFromMarker = Date.now() / 1000 - stat.mtimeMs / 1000;
       if (secondsFromMarker < 5) {
+        logger.debug("PreCompact 事件去重，跳过 Notification");
         return;
       }
       removeMarker(PRECOMPACT_MARKER);
     } catch {
-      // ignore stat errors
+      // 忽略 stat 错误
     }
   }
 
@@ -308,16 +189,36 @@ async function main(): Promise<void> {
   if (lastResponse) {
     let responseToShow = lastResponse;
     if (enableSummary && llmApiKey && lastResponse.length > 200) {
-      responseToShow = await summarizeWithLLM(lastResponse, llmApiType, llmApiKey, llmApiBase, llmModel);
+      const llmClient = new LlmClient({
+        apiType: llmApiType,
+        apiKey: llmApiKey,
+        apiBase: llmApiBase,
+        model: llmModel,
+      });
+      responseToShow = await llmClient.summarize(lastResponse);
     }
-    const escapedResponse = escapeMarkdownV2(responseToShow.slice(0, 500));
+
+    // 敏感信息过滤
+    const customPatterns = loadCustomPatterns();
+    const sanitizeResult = sanitize(responseToShow, customPatterns);
+
+    if (sanitizeResult.detectedCount > 0) {
+      logger.info(`检测到 ${sanitizeResult.detectedCount} 处敏感信息已脱敏: ${sanitizeResult.detectedTypes.join(', ')}`);
+    }
+
+    const escapedResponse = escapeMarkdownV2(sanitizeResult.sanitized.slice(0, 500));
     messageText += `\n*💬 Last Response:*\n\`${escapedResponse}\``;
+
+    if (sanitizeResult.detectedCount > 0) {
+      messageText += `\n⚠️ _检测到 ${sanitizeResult.detectedCount} 处敏感信息已自动脱敏_`;
+    }
   }
 
-  await sendTelegramNotification(botToken, chatId, messageText);
+  const notifier = createTelegramNotifier(botToken, chatId);
+  await notifier.send(messageText);
 }
 
 main().catch((error) => {
-  appendLog(`Fatal Error: ${(error as Error).message}\n`);
+  logger.error("致命错误", error as Error);
   process.exit(1);
 });

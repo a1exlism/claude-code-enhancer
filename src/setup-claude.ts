@@ -1,13 +1,18 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 const { promises: fsp } = fs;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const claudeDir = path.join(os.homedir(), '.claude');
 const claudeSettingsPath = path.join(claudeDir, 'settings.json');
 const backupSettingsPath = path.join(claudeDir, 'settings.json.bak');
-const notifyScriptPath = '/home/a1exlism/scripts/dist/aiagent-notify.js';
+// 动态解析路径：支持 npm link 全局安装和本地开发
+const notifyScriptPath = path.resolve(__dirname, 'aiagent-notify.js');
 const hookCommand = `node ${notifyScriptPath}`;
 const hookNames = ['Stop', 'SessionEnd'] as const;
 
