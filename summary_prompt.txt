@@ -7,5 +7,5 @@ Summarize the following response in 2-3 concise sentences, focusing on:
 
 Keep the summary clear, technical, and under 200 characters if possible.
 
-Response to summarize:
+Response to summarize(Using Chinese Language):
 {response}

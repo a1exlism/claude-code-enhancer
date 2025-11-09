@@ -1,4 +1,4 @@
-# Claude Code Enhancer
+# Claude Code Enhancer (Node.js)
 
 为 Claude Code 等 AI Agent 客户端提供增强功能的工具集。
 
@@ -17,12 +17,18 @@
 ### 一键配置
 
 ```bash
-# 1. 配置环境变量
+# 1. 安装依赖并构建
+npm install
+npm run build
+
+# 2. 配置环境变量
 cp .env.template .env
 # 编辑 .env 填入你的 Telegram Bot Token 和 Chat ID
 
-# 2. 自动配置 Claude Code hooks
-python3 setup_claude.py
+# 3. 自动配置 Claude Code hooks（任选其一）
+npx tsx src/setup-claude.ts
+# 或
+node dist/setup-claude.js
 ```
 
 ### 配置说明
@@ -44,3 +50,10 @@ python3 setup_claude.py
 ```bash
 ./test/test_aiagent_notify.sh
 ```
+
+## 从 Python 迁移
+
+- 运行流程切换到 `npm install && npm run build`，取代 `pip`/`python` 安装步骤
+- 自动化脚本统一为 TypeScript 版本，`setup_claude.py` 被 `src/setup-claude.ts` 与编译后的 `dist/setup-claude.js` 取代
+- CLI 功能与环境变量保持兼容，现可使用 Node.js 运行时调用
+- 测试脚本沿用 Shell 版本，可在 Node.js 构建产物上直接运行

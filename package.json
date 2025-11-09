@@ -1,0 +1,26 @@
+{
+  "name": "claude-code-enhancer",
+  "version": "2.0.0",
+  "description": "Claude Code 增强工具集 - Node.js 版本",
+  "type": "module",
+  "bin": {
+    "aiagent-notify": "dist/aiagent-notify.js",
+    "setup-claude": "dist/setup-claude.js",
+    "skill-install": "dist/skill-install.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "postbuild": "node build-tools/add-shebang.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.5"
+  }
+}

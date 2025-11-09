@@ -1,5 +1,17 @@
 # Changelog
 
+## 2025-11-07
+
+### Added
+
+- 完整 Node.js/TypeScript 重构
+- 支持全局安装（npm link）
+
+### Changed
+
+- 所有 Python 脚本迁移为 TypeScript
+- 使用 axios 替代 requests
+
 ## 2025-10-30
 
 ### Added
