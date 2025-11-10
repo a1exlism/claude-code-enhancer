@@ -1,5 +1,12 @@
 # Development Guidelines
 
+## Language Policy
+
+**Primary Language**: English
+- All code, comments, and commit messages use English
+- Technical documentation (README.md, API docs) in English
+- Separate Chinese version: README.zh_CN.md
+
 ## Philosophy
 
 ### Core Beliefs
