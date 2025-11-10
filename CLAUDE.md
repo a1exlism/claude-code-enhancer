@@ -26,30 +26,34 @@
 
 ## Available MCP Tools
 
-本项目已集成以下 MCP 服务器，AI 助手可按需使用：
+This project integrates the following MCP servers for AI assistants to use as needed:
 
 ### 📚 Documentation & Research
-- **context7** - 获取最新库文档（优先用于查询 API）
-- **gitmcp** - GitHub 仓库文档和代码搜索
+
+- **context7** - Fetch latest library docs (preferred for API queries)
+- **gitmcp** - GitHub repository docs and code search
 
 ### 🧠 Memory & Knowledge
-- **memory** - 知识图谱（可选：存储项目关键决策）
-- **sequential-thinking** - 结构化思维（可选：复杂问题分析）
+
+- **memory** - Knowledge graph (optional: store key project decisions)
+- **sequential-thinking** - Structured thinking (optional: complex problem analysis)
 
 ### 🌐 Web & Browser
-- **playwright** - 浏览器自动化（可选：Web 测试）
+
+- **playwright** - Browser automation (optional: web testing)
 
 ### 🛠️ Development Tools
-- **shrimp-task-manager** - 任务管理（可选：复杂任务规划）
-- **codex** - 代码会话（可选：代码生成辅助）
-- **ide** - VS Code 诊断和 Jupyter 执行
 
-### 使用原则
+- **shrimp-task-manager** - Task management (optional: complex task planning)
+- **codex** - Code sessions (optional: code generation assistance)
+- **ide** - VS Code diagnostics and Jupyter execution
 
-1. **按需使用** - 工具是可选的，不是必需的
-2. **优先简单** - 能直接完成的任务不使用工具
-3. **文档优先** - 遇到 API 问题时使用 context7/gitmcp
-4. **知识积累** - 重要决策可用 memory 存储
+### Usage Principles
+
+1. **Use as Needed** - Tools are optional, not required
+2. **Prefer Simplicity** - Don't use tools for tasks you can complete directly
+3. **Documentation First** - Use context7/gitmcp when encountering API issues
+4. **Knowledge Accumulation** - Use memory to store important decisions
 
 ## Development Workflow
 
