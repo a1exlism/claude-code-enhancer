@@ -439,3 +439,7 @@ sketch
 # Recommended template: Node.gitignore
 
 # End of https://www.toptal.com/developers/gitignore/api/git,vim,visualstudiocode,linux,macos,python
+
+### Project-specific ###
+# i18n localized files (local reference only)
+CHANGELOG.zh-CN.md

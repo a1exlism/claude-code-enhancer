@@ -1,5 +1,7 @@
 # Claude Code Enhancer
 
+简体中文 | [English](./README.md)
+
 [![CI](https://github.com/a1exlism/scripts/workflows/CI/badge.svg)](https://github.com/a1exlism/scripts/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)

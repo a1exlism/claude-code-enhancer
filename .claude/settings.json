@@ -4,6 +4,9 @@
     "deny": [
       "Read(./.env)"
     ],
-    "ask": []
+    "ask": [
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ]
   }
 }

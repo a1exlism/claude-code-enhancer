@@ -2,167 +2,176 @@
 
 ## 2025-11-10
 
+### Added
+- Added i18n support with English/Chinese documentation
+  - Created English README.md (primary version)
+  - Created README.zh-CN.md (Chinese localized version)
+  - Added language switcher links in both READMEs
+  - Translated CHANGELOG.md to English
+  - Added i18n guidelines to CLAUDE.md with CHANGELOG workflow
+  - Configured CHANGELOG.zh-CN.md as gitignored local reference
+
 ### Changed
-- 升级 CLAUDE.md 为完整版开发指南（222行）
-- 新增项目概览、开发流程、质量门禁章节
-- 新增 TypeScript/Vitest 规范和模块设计指导
-- 优化 MCP 工具章节，添加使用原则
-- 新增常见任务流程和 FAQ
+- Upgraded CLAUDE.md to complete development guide (222 lines)
+- Added project overview, development workflow, quality gates sections
+- Added TypeScript/Vitest guidelines and module design guidance
+- Optimized MCP tools section with usage principles
+- Added common task workflows and FAQ
 
 ---
 
-## 2025-11-10 (v2.1.0 - MVP 安全性与质量改进)
+## 2025-11-10 (v2.1.0 - MVP Security & Quality Improvements)
 
 ### Added
 
-- **敏感信息过滤器** (src/utils/sanitizer.ts)
-  - 自动检测并脱敏 13+ 种敏感模式（API Key、Token、密码等）
-  - 支持自定义过滤模式（环境变量配置）
-  - 保留前后 3 字符用于调试，防止完全信息丢失
-  - 34 个单元测试覆盖，测试覆盖率 > 90%
-- **优化 Claude 提示词** (summary_prompt.txt)
-  - 遵循 Anthropic 最佳实践：XML 标签结构化
-  - 提供 5 个高质量 Few-shot 示例
-  - 明确输出格式（120-180 中文字符）
-  - 详细的技术术语指导原则
-- **Claude API 优化** (src/utils/llm-client.ts)
-  - 支持独立 system 参数（Claude 最佳实践）
-  - 增加 max_tokens 至 400（支持更长总结）
-  - 降低 temperature 至 0.3（提高一致性）
-  - 自动提取 `<role>` 标签作为 system prompt
+- **Sensitive Data Filter** (src/utils/sanitizer.ts)
+  - Auto-detect and sanitize 13+ sensitive patterns (API Keys, Tokens, passwords, etc.)
+  - Support custom filter patterns (environment variable configuration)
+  - Preserve first/last 3 characters for debugging, prevent complete information loss
+  - 34 unit tests with >90% coverage
+- **Optimized Claude Prompt** (summary_prompt.txt)
+  - Follow Anthropic best practices: XML tag structure
+  - Provide 5 high-quality few-shot examples
+  - Clear output format (120-180 Chinese characters)
+  - Detailed technical terminology guidelines
+- **Claude API Optimization** (src/utils/llm-client.ts)
+  - Support independent system parameter (Claude best practice)
+  - Increase max_tokens to 400 (support longer summaries)
+  - Reduce temperature to 0.3 (improve consistency)
+  - Auto-extract `<role>` tags as system prompt
 
 ### Changed
 
-- **通知流程增强**
-  - 集成敏感信息过滤到 aiagent-notify.ts
-  - 检测到敏感信息时自动标注数量和类型
-  - 日志记录脱敏详情（/tmp/claude_hook_debug.log）
-- **配置模板更新** (.env.template)
-  - 默认 LLM API 类型改为 anthropic
-  - 添加安全配置说明
-  - 更新模型示例为 claude-3-5-haiku-20241022
+- **Notification Flow Enhancement**
+  - Integrate sensitive data filter into aiagent-notify.ts
+  - Auto-annotate count and type when sensitive data detected
+  - Log sanitization details (/tmp/claude_hook_debug.log)
+- **Configuration Template Update** (.env.template)
+  - Change default LLM API type to anthropic
+  - Add security configuration instructions
+  - Update model example to claude-3-5-haiku-20241022
 
 ### Security
 
-- **防止凭证泄露**：API Key、Token、密码等敏感信息自动脱敏后再发送到 Telegram
-- **可配置过滤**：支持自定义敏感模式以适应特定安全需求
+- **Prevent Credential Leaks**: API Keys, Tokens, passwords auto-sanitized before sending to Telegram
+- **Configurable Filtering**: Support custom sensitive patterns for specific security needs
 
 ### Fixed
 
-- 修复 LLM 总结质量不稳定问题（通过优化提示词和 API 参数）
-- 修复测试用例以匹配新的 API 调用参数
+- Fixed unstable LLM summary quality (via optimized prompt and API parameters)
+- Fixed test cases to match new API call parameters
 
 ---
 
-## 2025-11-10 (之前版本)
+## 2025-11-10 (Previous Version)
 
 ### Added
 
-- 新增 `src/utils/` 模块化架构
-  - `env.ts` - 环境变量加载工具
-  - `markdown.ts` - Markdown 转义和时间格式化
-  - `llm-client.ts` - LLM API 客户端（支持 OpenAI/Azure/Anthropic）
-  - `notifier.ts` - 通知接口和 Telegram 实现
-  - `logger.ts` - 结构化日志工具
-- 新增完整测试体系
-  - 配置 Vitest 测试框架
-  - 17 个单元测试覆盖核心逻辑
-  - 测试覆盖率报告（c8）
-- 新增 GitHub Actions CI/CD 流程
-  - 自动运行测试（Node.js 18/20/22）
-  - TypeScript 类型检查
-  - 代码覆盖率上传
+- Added `src/utils/` modular architecture
+  - `env.ts` - Environment variable loading utility
+  - `markdown.ts` - Markdown escaping and time formatting
+  - `llm-client.ts` - LLM API client (supports OpenAI/Azure/Anthropic)
+  - `notifier.ts` - Notification interface and Telegram implementation
+  - `logger.ts` - Structured logging utility
+- Added complete test system
+  - Configured Vitest testing framework
+  - 17 unit tests covering core logic
+  - Test coverage reporting (c8)
+- Added GitHub Actions CI/CD pipeline
+  - Auto-run tests (Node.js 18/20/22)
+  - TypeScript type checking
+  - Code coverage upload
 
 ### Changed
 
-- 重构 `aiagent-notify.ts` 使用 utils 模块
-- 重构 `setup-claude.ts` 修复硬编码路径问题
-  - 使用 `__dirname` 动态解析路径
-  - 支持 npm link 全局安装
-- 优化 package.json 脚本
-  - 新增 `test`、`test:watch`、`test:coverage`
-  - 新增 `typecheck` 类型检查
-- 更新 README.md 文档
-  - 新增架构设计说明
-  - 新增测试和开发指南
-  - 新增项目结构图
+- Refactored `aiagent-notify.ts` to use utils modules
+- Refactored `setup-claude.ts` to fix hardcoded path issues
+  - Use `__dirname` for dynamic path resolution
+  - Support npm link global installation
+- Optimized package.json scripts
+  - Added `test`, `test:watch`, `test:coverage`
+  - Added `typecheck` type checking
+- Updated README.md documentation
+  - Added architecture design explanation
+  - Added testing and development guide
+  - Added project structure diagram
 
 ### Removed
 
-- 删除所有 Python 遗留文件
+- Removed all Python legacy files
   - `aiagent_notify.py`
   - `setup_claude.py`
   - `skill_install.py`
 
 ### Fixed
 
-- 修复跨机器部署路径问题
-- 修复代码重复问题（DRY 原则）
+- Fixed cross-machine deployment path issues
+- Fixed code duplication issues (DRY principle)
 
 ## 2025-11-07
 
 ### Added
 
-- 完整 Node.js/TypeScript 重构
-- 支持全局安装（npm link）
+- Complete Node.js/TypeScript refactor
+- Support global installation (npm link)
 
 ### Changed
 
-- 所有 Python 脚本迁移为 TypeScript
-- 使用 axios 替代 requests
+- Migrated all Python scripts to TypeScript
+- Use axios instead of requests
 
 ## 2025-10-30
 
 ### Added
 
-- 新增 LLM 总结功能，支持 OpenAI/Azure/Anthropic API
-- 新增 summary_prompt.txt 总结模板文件
-- LLM 总结仅对超过 200 字的响应生效
-- TODO: 提示词风格、组装
-- 新增 CLAUDE_CODE_BEST_PRACTICES.md 最佳实践文档
+- Added LLM summarization feature, supports OpenAI/Azure/Anthropic API
+- Added summary_prompt.txt summary template file
+- LLM summarization only activates for responses over 200 characters
+- TODO: Prompt style, assembly
+- Added CLAUDE_CODE_BEST_PRACTICES.md best practices document
 
 ### Changed
 
-- 优化 LLM API 调用，使用官方标准格式
-- 更新 .env.template 配置示例，明确支持的 API 类型和模型
-- 精简 CLAUDE.md 开发指南，移除冗余指令
+- Optimized LLM API calls using official standard format
+- Updated .env.template configuration examples, clarified supported API types and models
+- Streamlined CLAUDE.md development guide, removed redundant instructions
 
 ### Fixed
 
-- 修复 PreCompact 事件重复发送通知问题
+- Fixed PreCompact event duplicate notification issue
 
 ### Research
 
-- 完成 Claude Code 最佳实践调研（项目构建、上下文处理、MCP 集成）
+- Completed Claude Code best practices research (project building, context handling, MCP integration)
 
 ## 2025-10-29
 
 ### Changed
 
-- 更新 .gitignore 为标准 Python 项目模板
-- 忽略 /clear 命令触发的 SessionEnd 通知
+- Updated .gitignore to standard Python project template
+- Ignore SessionEnd notifications triggered by /clear command
 
 ## 2025-10-28
 
 ### Added
 
-- 新增 skill_install.py 一键安装脚本
-- 新增 CLAUDE_SKILLS_SETUP.md 安装指南文档
-- 支持自动安装 Claude Skills (document-skills + example-skills)
-- 支持自动配置插件市场
+- Added skill_install.py one-click installation script
+- Added CLAUDE_SKILLS_SETUP.md installation guide document
+- Support auto-install Claude Skills (document-skills + example-skills)
+- Support auto-configure plugin marketplace
 
 ## 2025-10-27
 
 ### Added
 
-- 新增 Notification hook 监控错误和警告通知
-- 新增 PreCompact hook 监控上下文不足警告
+- Added Notification hook to monitor error and warning notifications
+- Added PreCompact hook to monitor low context warnings
 
 ### Changed
 
-- 优化环境变量加载逻辑：优先读取当前项目 .env，后备使用主目录 .env
-- 简化 README.md 文档结构
+- Optimized environment variable loading logic: prioritize current project .env, fallback to home directory .env
+- Simplified README.md document structure
 
 ### Fixed
 
-- 修复其他项目无法发送 Telegram 通知的问题
+- Fixed issue where other projects couldn't send Telegram notifications

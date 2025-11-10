@@ -5,7 +5,29 @@
 **Primary Language**: English
 - All code, comments, and commit messages use English
 - Technical documentation (README.md, API docs) in English
-- Separate Chinese version: README.zh_CN.md
+- Localized versions follow pattern: README.{locale}.md
+
+### i18n Guidelines
+
+**Documentation Structure**:
+- `README.md` - English (primary, required)
+- `README.zh-CN.md` - Simplified Chinese (localized)
+- `CHANGELOG.md` - English only (version controlled)
+- `CHANGELOG.zh-CN.md` - Simplified Chinese (local only, gitignored)
+
+**Language Switcher**:
+- Add language links at top of each README: `简体中文 | [English](./README.md)`
+- Keep content functionally equivalent across languages
+
+**Content Synchronization**:
+- Update all language versions when adding features
+- Use LLM translation for efficiency (manual review recommended)
+- Prioritize English version if synchronization lags
+
+**CHANGELOG Workflow**:
+- After updating `CHANGELOG.md`, sync to local `CHANGELOG.zh-CN.md`
+- `CHANGELOG.zh-CN.md` is gitignored (local reference only)
+- Only English CHANGELOG is version controlled
 
 ## Project Overview
 
