@@ -443,3 +443,7 @@ sketch
 ### Project-specific ###
 # i18n localized files (local reference only)
 CHANGELOG.zh-CN.md
+analysis
+CLAUDE.local.md
+data/tasks.json
+data/memory
