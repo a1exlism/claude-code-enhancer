@@ -157,8 +157,67 @@ hookSystem.register({
 
 See [Getting Started Guide](./docs/guides/getting-started.md) for detailed usage instructions.
 
+## 🏗️ Architecture
+
+### Overall Architecture
+
+```mermaid
+graph TB
+    subgraph "Core Framework v0.1.0"
+        CM[ConfigManager]
+        EB[EventBus]
+        HS[HookSystem]
+    end
+
+    subgraph "Configuration Sources"
+        ENV[Environment Variables]
+        PC[Project Config]
+        UC[User Config]
+        DC[Default Config]
+    end
+
+    subgraph "Hook Handlers"
+        PTU[PreToolUse Hooks]
+        POTU[PostToolUse Hooks]
+        SS[SessionStart Hooks]
+    end
+
+    subgraph "Services"
+        LOG[Logger]
+        NOTIFIER[Notifier]
+    end
+
+    ENV --> CM
+    PC --> CM
+    UC --> CM
+    DC --> CM
+
+    CM -.provides config.-> HS
+    EB -.provides events.-> HS
+
+    PTU --> HS
+    POTU --> HS
+    SS --> HS
+
+    HS -.uses.-> LOG
+    HS -.triggers.-> EB
+    LOG --> NOTIFIER
+
+    style CM fill:#e1f5ff
+    style EB fill:#fff4e1
+    style HS fill:#e8f5e9
+```
+
+See [Architecture Diagrams](./docs/architecture-diagram.md) for detailed diagrams including:
+- Component Interaction Flow
+- Hook Execution Flow
+- Configuration Loading Flow
+- Event Flow
+- Complete Workflow Examples
+
 ## 📚 Documentation
 
+- **[Architecture Diagrams](./docs/architecture-diagram.md)** - Visual architecture and flow diagrams
 - **[Getting Started Guide](./docs/guides/getting-started.md)** - Complete introduction to the core framework
 - **[Configuration Examples](./docs/examples/config-examples.md)** - Practical configuration examples
 - **[Hook Examples](./docs/examples/hook-examples.md)** - Hook implementation examples
