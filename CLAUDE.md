@@ -32,10 +32,11 @@
 ## Project Overview
 
 - **Type**: CLI Tools (TypeScript/Node.js)
+- **Version**: 0.1.0 (follows Semantic Versioning: major.minor.patch)
 - **Scale**: Small (~1900 lines: 1270 src + 661 tests)
-- **Tech Stack**: TypeScript 5.4, Vitest, axios, dotenv
+- **Tech Stack**: TypeScript 5.4, Vitest, axios, dotenv, zod
 - **Build**: npm scripts (tsc compiler)
-- **Test**: Vitest + 51 unit tests
+- **Test**: Vitest + 124 unit tests
 - **CI/CD**: GitHub Actions (Node.js 18/20/22)
 
 ## Core Principles
@@ -151,6 +152,49 @@ Update on: new features, bug fixes, breaking changes
 - `docs: update configuration guide`
 
 **Forbidden**: Technical details, AI information, implementation specifics
+
+## Version Management
+
+**Current Version**: 0.1.0
+
+**Versioning Scheme**: Semantic Versioning (major.minor.patch)
+
+- **Major (X.0.0)**: Breaking changes, incompatible API changes
+- **Minor (0.X.0)**: New features, backward-compatible functionality
+- **Patch (0.0.X)**: Bug fixes, backward-compatible fixes
+
+**Version Bump Rules**:
+
+1. **Breaking Changes** → Bump major version
+   - API signature changes
+   - Configuration format changes
+   - Removed features
+   - Example: `1.0.0` → `2.0.0`
+
+2. **New Features** → Bump minor version
+   - New hooks, modules, or commands
+   - New configuration options
+   - Enhanced functionality
+   - Example: `0.1.0` → `0.2.0`
+
+3. **Bug Fixes** → Bump patch version
+   - Bug fixes
+   - Performance improvements
+   - Documentation updates
+   - Example: `0.1.0` → `0.1.1`
+
+**Pre-1.0.0 Policy**:
+- Current phase: MVP development (0.x.x)
+- Breaking changes allowed in minor versions
+- Stable API expected at 1.0.0
+
+**Version Update Workflow**:
+
+1. Update version in `package.json`
+2. Update version in `CLAUDE.md` (Project Overview)
+3. Update `CHANGELOG.md` with version header
+4. Commit with message: `chore: bump version to X.Y.Z`
+5. Create git tag: `git tag vX.Y.Z`
 
 ## Anti-Patterns
 

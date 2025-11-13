@@ -1,16 +1,41 @@
 # Changelog
 
-## 2025-11-13
+## 2025-11-13 (v0.1.0 - Core Framework MVP)
 
 ### Added
+- Added core framework foundation (Phase 1 - Week 1 complete)
+  - **ConfigManager**: Configuration management with Zod validation
+    - JSON configuration file support with environment variable interpolation
+    - Configuration priority: project > user > default
+    - Environment variable overrides (`CLAUDE_ENHANCER_*`)
+    - Strict validation mode with detailed error messages
+    - 21 unit tests with full coverage
+  - **EventBus**: Event-driven pub/sub system
+    - Synchronous and asynchronous event listeners
+    - One-time listeners and wildcard support
+    - Error isolation between listeners
+    - 28 unit tests with full coverage
+  - **HookSystem**: Hook registration and execution engine
+    - Priority-based hook execution
+    - Timeout control and matcher pattern filtering
+    - Service injection (EventBus, ConfigManager, Logger)
+    - Integration with configuration system
+    - 24 unit tests with full coverage
 - Added type system foundation for framework core
   - Added `src/types/config.ts` with Zod-based configuration schemas
   - Added `src/types/hooks.ts` with Hook system type definitions
   - Added `src/types/events.ts` with Event bus type definitions
   - Added `zod` dependency for runtime type validation
+- Added version management to CLAUDE.md
+  - Semantic versioning policy (major.minor.patch)
+  - Version bump rules and workflow
+  - Current version: 0.1.0 (MVP phase)
 
 ### Changed
 - Updated `src/types/index.ts` to export all type definitions
+- Updated `src/core/index.ts` to export core framework modules
+- Updated CLAUDE.md with version management guidelines
+- Updated project statistics: 124 unit tests (was 51)
 
 ---
 
