@@ -1,5 +1,19 @@
 # Changelog
 
+## 2025-11-13
+
+### Added
+- Added type system foundation for framework core
+  - Added `src/types/config.ts` with Zod-based configuration schemas
+  - Added `src/types/hooks.ts` with Hook system type definitions
+  - Added `src/types/events.ts` with Event bus type definitions
+  - Added `zod` dependency for runtime type validation
+
+### Changed
+- Updated `src/types/index.ts` to export all type definitions
+
+---
+
 ## 2025-11-10
 
 ### Added
